@@ -10,7 +10,7 @@ func CheckAntNumber(line string) bool {
 	n, err := strconv.Atoi(line)
 
 	if err != nil || n <= 0 {
-		fmt.Println("ERROR : Invalid number of ants")
+		fmt.Println("ERROR : Invalid number of ants. Must a number > 0, is", line)
 		return false
 	}
 

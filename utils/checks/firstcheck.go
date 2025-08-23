@@ -7,15 +7,15 @@ import (
 )
 
 // Fonction générale pour vérifier que le format du fichier est correct
-func IsValid(content *os.File) bool {
+func FirstCheck(file *os.File) bool {
 	// Vérifie qu'il y a bien une room "start" et une room "end"
-	if !CheckStartEnd(content) {
+	if !CheckStartEnd(file) {
 		return false
 	}
 
 	// Remet le fichier à zéro pour les vérifications suivantes
-	content.Seek(0, 0)
-	scanner := bufio.NewScanner(content)
+	file.Seek(0, 0)
+	scanner := bufio.NewScanner(file)
 	linecount := 0
 
 	for scanner.Scan() {
@@ -25,8 +25,6 @@ func IsValid(content *os.File) bool {
 		// Vérifie si la première ligne est un nombre de fourmis valide
 		if linecount == 1 {
 			if !CheckAntNumber(line) {
-				fmt.Println(linecount)
-				fmt.Println(line)
 				return false
 			}
 			continue

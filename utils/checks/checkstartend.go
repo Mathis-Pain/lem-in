@@ -20,14 +20,19 @@ func CheckStartEnd(content *os.File) bool {
 			return true
 		}
 		if line == "##start" {
+			if hasStart {
+				return false
+			}
 			hasStart = true
 			continue
 		}
 		if line == "##end" {
+			if hasEnd {
+				return false
+			}
 			hasEnd = true
 			continue
 		}
-
 	}
 
 	// Si la boucle se termine et qu'il manque une des deux salles, renvoie un message d'erreur
