@@ -15,7 +15,7 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 	var AllRooms models.Roomlist
 	var Links []models.Link
 	var NextIsStart, NextIsEnd bool
-	var NoMoreRooms bool
+	NoMoreRooms := false
 
 	scanner := bufio.NewScanner(file)
 
@@ -57,16 +57,22 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 				AllRooms.Rooms = append(AllRooms.Rooms, GetRoom(parts))
 			}
 			continue
-		} else {
+		} else if AllRooms.End.Name != "" {
 			NoMoreRooms = true
-			// Sinon, ça veut dire qu'on a atteint la fin de la liste de salles
+			// Si la room end n'est pas vide, ça veut dire qu'on a atteint la fin de la liste de salles
 		}
 
 		// Si la ligne ne comporte pas trois parties, on vérifie s'il s'agit d'un "link", tunnel entre deux salles
+
 		if strings.Contains(line, "-") && checks.CheckLinks(line) {
 			Links = append(Links, GetLink(line))
 
 		}
+	}
+
+	for _, link := range Links {
+		fmt.Println("from :", link.From)
+		fmt.Println("to :", link.To)
 	}
 
 	return AllRooms, Links

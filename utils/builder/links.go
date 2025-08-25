@@ -16,8 +16,5 @@ func GetLink(line string) models.Link {
 		os.Exit(0)
 	}
 
-	current.From = parts[0]
-	current.To = parts[1]
-
 	return current
 }
