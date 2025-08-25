@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"lem-in/models"
-	"lem-in/utils/checks"
 	"os"
 	"strings"
 )
@@ -64,7 +63,7 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 
 		// Si la ligne ne comporte pas trois parties, on vérifie s'il s'agit d'un "link", tunnel entre deux salles
 
-		if strings.Contains(line, "-") && checks.CheckLinks(line) {
+		if strings.Contains(line, "-") {
 			Links = append(Links, GetLink(line))
 
 		}
