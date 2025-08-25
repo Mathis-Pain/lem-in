@@ -13,12 +13,15 @@ func CheckSameRoom(rooms models.Roomlist) bool {
 	}
 	names = append(names, rooms.End.Name, rooms.Start.Name)
 
-	//on parcoure ces noms pour vérifier qu'il n'y aucun doublon
-	for i := 0; i < len(names)-1; i++ {
-		if names[i] == names[i+1] {
-			fmt.Println("ERROR : Invalid format, two rooms with the same name")
-			return true
+	seen := make(map[string]int)
+
+	for _, name := range names {
+		seen[name]++
+		if seen[name] > 1 {
+			fmt.Print("Error same room")
+			return false
 		}
 	}
 	return true
+
 }

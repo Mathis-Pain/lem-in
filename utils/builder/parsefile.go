@@ -69,10 +69,11 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 		}
 	}
 
-	for _, link := range Links {
+	/* 	for _, link := range Links {
 		fmt.Println("from :", link.From)
 		fmt.Println("to :", link.To)
-	}
+		fmt.Println()
+	} */
 
 	return AllRooms, Links
 }

@@ -12,7 +12,7 @@ func LastCheck(allRooms models.Roomlist, links []models.Link) bool {
 	}
 
 	if unitchecks.CheckSameRoom(allRooms) {
-		return false
+		return true
 	}
 	return true
 }

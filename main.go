@@ -24,4 +24,5 @@ func main() {
 	checks.FirstCheck(content)
 
 	checks.LastCheck(builder.ParseFile(content))
+
 }
