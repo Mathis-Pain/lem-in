@@ -3,13 +3,15 @@ package checks
 import (
 	"bufio"
 	"fmt"
+	"lem-in/utils/checks/unitchecks"
 	"os"
+	"strings"
 )
 
 // Fonction générale pour vérifier que le format du fichier est correct
 func FirstCheck(file *os.File) bool {
 	// Vérifie qu'il y a bien une room "start" et une room "end"
-	if !CheckStartEnd(file) {
+	if !unitchecks.CheckStartEnd(file) {
 		return false
 	}
 
@@ -24,16 +26,20 @@ func FirstCheck(file *os.File) bool {
 
 		// Vérifie si la première ligne est un nombre de fourmis valide
 		if linecount == 1 {
-			if !CheckAntNumber(line) {
+			if !unitchecks.CheckAntNumber(line) {
 				return false
 			}
 			continue
-		} else {
-			if line[0] == 'L' {
-				fmt.Println("ERROR : Invalid room name format (starting with an L)")
-				return false
+		} else if line[0] == 'L' {
+			fmt.Println("ERROR : Invalid room name format (starting with an L)")
+			return false
+			//on vérifie la validité des links
+		} else if strings.Contains(line, "-") {
+			if !unitchecks.CheckLinks(line) {
+				fmt.Println("ERROR : Invalid link (each links needs two different rooms)")
 			}
 		}
+
 	}
 
 	return true
