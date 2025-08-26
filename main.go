@@ -8,12 +8,13 @@ import (
 )
 
 func main() {
-	content := utils.FileMaker(os.Args)
+	n, content := utils.FileMaker(os.Args)
 	if content == nil {
 		return
 	}
 	defer content.Close()
 
-	fmt.Println(builder.PathMaker(content))
+	AllPath := builder.PathMaker(content)
 
+	fmt.Printf("Fourmis : %v, Chemins : %v\n", n, AllPath)
 }

@@ -6,24 +6,26 @@ import (
 	"os"
 )
 
-func FileMaker(args []string) *os.File {
+func FileMaker(args []string) (int, *os.File) {
 	var content *os.File
 
 	if len(args) != 2 {
 		fmt.Println("ERROR : Program needs two arguments to run")
-		return nil
+		return 0, nil
 	}
 	file := os.Args[1]
 
 	content, err := os.Open("./examples/" + file)
 	if err != nil {
 		fmt.Println("ERROR : Error opening file ", err)
-		return nil
+		return 0, nil
 	}
 
-	if !checks.FirstCheck(content) {
-		return nil
+	n, checks := checks.FirstCheck(content)
+
+	if !checks {
+		return n, nil
 	}
 
-	return content
+	return n, content
 }
