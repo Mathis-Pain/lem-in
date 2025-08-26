@@ -18,7 +18,7 @@ func CheckSameRoom(rooms models.Roomlist) bool {
 	for _, name := range names {
 		seen[name]++
 		if seen[name] > 1 {
-			fmt.Print("Error same room")
+			fmt.Print("ERROR : Wrong format. The same room was created twice.")
 			return false
 		}
 	}

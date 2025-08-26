@@ -10,7 +10,7 @@ func Onelink(links []models.Link) bool {
 	for _, link := range links {
 		seen[link]++
 		if seen[link] > 1 {
-			fmt.Println("Error: there is more than one way")
+			fmt.Println("ERROR : Wrong format. More than one link between the two same rooms.")
 			return false
 		}
 	}
