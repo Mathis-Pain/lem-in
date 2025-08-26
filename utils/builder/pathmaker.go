@@ -41,5 +41,6 @@ func PathMaker(content *os.File) [][]string {
 	// Lancer l’exploration depuis "start"
 	explore(AllRooms.Start.Name, AllRooms.End.Name, Links, visited, []string{}, &allPaths)
 
+	allPaths = FilterPath(allPaths)
 	return allPaths
 }
