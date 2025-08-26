@@ -8,10 +8,11 @@ import (
 	"strings"
 )
 
+var AllRooms models.Roomlist
+
 func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 	file.Seek(0, 0)
 
-	var AllRooms models.Roomlist
 	var Links []models.Link
 	var NextIsStart, NextIsEnd bool
 	NoMoreRooms := false
