@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"lem-in/utils"
 	"lem-in/utils/builder"
 	"os"
@@ -13,6 +14,6 @@ func main() {
 	}
 	defer content.Close()
 
-	AllRooms, Links := builder.ParseFile(content)
+	fmt.Println(builder.PathMaker(content))
 
 }
