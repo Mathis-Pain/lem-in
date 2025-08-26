@@ -1,17 +1,16 @@
-package checks
+package unitchecks
 
 import (
 	"lem-in/models"
-	"lem-in/utils/checks/unitchecks"
 )
 
 func LastCheck(allRooms models.Roomlist, links []models.Link) bool {
 
-	if !unitchecks.Onelink(links) {
+	if !Onelink(links) {
 		return false
 	}
 
-	if unitchecks.CheckSameRoom(allRooms) {
+	if CheckSameRoom(allRooms) {
 		return true
 	}
 	return true

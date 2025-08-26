@@ -3,6 +3,7 @@ package checks
 import (
 	"bufio"
 	"fmt"
+	"lem-in/utils/builder"
 	"lem-in/utils/checks/unitchecks"
 	"os"
 	"strings"
@@ -37,10 +38,11 @@ func FirstCheck(file *os.File) bool {
 		} else if strings.Contains(line, "-") {
 			if !unitchecks.CheckLinks(line) {
 				fmt.Println("ERROR : Invalid link (each links needs two different rooms)")
+				return false
 			}
 		}
 
 	}
 
-	return true
+	return unitchecks.LastCheck(builder.ParseFile(file))
 }
