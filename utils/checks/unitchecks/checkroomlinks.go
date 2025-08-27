@@ -23,10 +23,10 @@ func CheckRoomLinks(AllRooms models.Roomlist, Links []models.Link) bool {
 
 	for _, current := range Links {
 		if !validName[current.To] {
-			fmt.Println("ERROR : Wrong format. One or more links contain invalid room name : ", current.To)
+			fmt.Println("ERROR <checkroomlinks.go>-l26: Wrong format. One or more links contain invalid room name : ", current.To)
 			return false
 		} else if !validName[current.From] {
-			fmt.Println("ERROR : Wrong format. One or more links contain invalid room name : ", current.From)
+			fmt.Println("ERROR <checkroomlinks.go>-l29: Wrong format. One or more links contain invalid room name : ", current.From)
 			return false
 		}
 

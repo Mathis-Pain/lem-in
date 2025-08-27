@@ -7,14 +7,6 @@ import (
 	"os"
 )
 
-/*
-	func OnTheRoad(n int, AllPath [][]string){
-
-NbrOfRoad:=len(AllPath)
-NbrOfTurn :=
-
-	}
-*/
 func main() {
 	n, content := utils.FileMaker(os.Args)
 	if content == nil {

@@ -40,7 +40,7 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 		// Vérifie si une pièce ne se trouve pas au mauvais endroit du fichier
 		// Il ne peut pas y avoir de nouvelle pièce une fois qu'on a commencé à ajouter des links
 		if NoMoreRooms && len(parts) == 3 {
-			fmt.Println("ERROR : Wrong file format : new room added after the end of the room list")
+			fmt.Println("ERROR <parsefile.go>-l43 : Wrong file format : new room added after the end of the room list")
 			os.Exit(0)
 		}
 
