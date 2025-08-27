@@ -10,9 +10,8 @@ func LastCheck(allRooms models.Roomlist, links []models.Link) bool {
 		return false
 	}
 
-	checkSameRoom, _ := CheckSameRoom(allRooms)
-	if checkSameRoom {
-		return true
+	if !CheckSameRoom(allRooms) {
+		return false
 	}
 	return true
 }
