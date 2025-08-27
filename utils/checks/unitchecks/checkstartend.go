@@ -15,10 +15,6 @@ func CheckStartEnd(content *os.File) bool {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		// Termine la boucle et renvoie true si les deux lignes ont été trouvée
-		if hasStart && hasEnd {
-			return true
-		}
 		if line == "##start" {
 			if hasStart {
 				return false
@@ -33,6 +29,10 @@ func CheckStartEnd(content *os.File) bool {
 			hasEnd = true
 			continue
 		}
+	}
+
+	if hasStart && hasEnd {
+		return true
 	}
 
 	// Si la boucle se termine et qu'il manque une des deux salles, renvoie un message d'erreur

@@ -35,9 +35,10 @@ func FirstCheck(file *os.File) (int, bool) {
 			n, _ = strconv.Atoi(line)
 			continue
 		} else if line[0] == 'L' {
+			// Le nom des salles ne doit pas commencer par un L (réservé aux fourmis)
 			fmt.Println("ERROR : Invalid room name format (starting with an L)")
 			return n, false
-			//on vérifie la validité des links
+			// on vérifie que les links relient bien deux salles différentes
 		} else if strings.Contains(line, "-") {
 			if !unitchecks.CheckLinks(line) {
 				fmt.Println("ERROR : Invalid link (each links needs two different rooms)")
@@ -47,5 +48,6 @@ func FirstCheck(file *os.File) (int, bool) {
 
 	}
 
+	// Lance les derniers checks après avoir récupéré les informations des salles
 	return n, unitchecks.LastCheck(builder.ParseFile(file))
 }
