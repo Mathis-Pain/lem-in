@@ -25,7 +25,7 @@ func GetRoom(parts []string) models.Room {
 // Message d'erreur si le format n'est pas bon
 func RoomError(err error, parts []string) {
 	if err != nil {
-		fmt.Println("ERROR : Invalid room coordinates for room ", parts[0])
+		fmt.Println("ERROR <rooms.go>-l28: Invalid room coordinates for room ", parts[0])
 		os.Exit(0)
 	}
 }

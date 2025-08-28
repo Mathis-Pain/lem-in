@@ -37,9 +37,9 @@ func CheckStartEnd(content *os.File) bool {
 
 	// Si la boucle se termine et qu'il manque une des deux salles, renvoie un message d'erreur
 	if hasStart && !hasEnd {
-		fmt.Println("ERROR : Missing an end room")
+		fmt.Println("ERROR <checkstartend.go>-l40: Missing an end room")
 	} else if hasEnd && !hasStart {
-		fmt.Println("ERROR : Missing a start room")
+		fmt.Println("ERROR <checkstartend.go>-l42: Missing a start room")
 	}
 
 	return false

@@ -35,13 +35,13 @@ func FirstCheck(file *os.File) (int, bool) {
 			n, _ = strconv.Atoi(line)
 			continue
 		} else if line[0] == 'L' {
+			fmt.Println("ERROR <firstcheck.go>-l38: Invalid room name format (starting with an L)")
 			// Le nom des salles ne doit pas commencer par un L (réservé aux fourmis)
-			fmt.Println("ERROR : Invalid room name format (starting with an L)")
 			return n, false
 			// on vérifie que les links relient bien deux salles différentes
 		} else if strings.Contains(line, "-") {
 			if !unitchecks.CheckLinks(line) {
-				fmt.Println("ERROR : Invalid link (each links needs two different rooms)")
+				fmt.Println("ERROR <firstcheck.go>-l38: Invalid link (each links needs two different rooms)")
 				return n, false
 			}
 		}

@@ -5,23 +5,23 @@ import (
 	"lem-in/models"
 )
 
-func CheckSameRoom(rooms models.Roomlist) bool {
-	names := []string{}
-	//on crée une slice de string names dans laquelle on range les noms de toutes les pièces
-	for _, room := range rooms.Rooms {
-		names = append(names, room.Name)
-	}
-	names = append(names, rooms.End.Name, rooms.Start.Name)
+func CheckSameRoom(AllRooms models.Roomlist) bool {
+	seenNames := make(map[string]bool)
+	seenCoords := make(map[[2]int]bool)
 
-	seen := make(map[string]int)
-
-	for _, name := range names {
-		seen[name]++
-		if seen[name] > 1 {
-			fmt.Print("ERROR : Wrong format. The same room was created twice.")
+	for _, r := range AllRooms.Rooms {
+		if seenNames[r.Name] {
+			fmt.Printf("ERROR <checksameroom.go>-l14: Wrong format. Same room name : %v", r.Name)
 			return false
 		}
+		seenNames[r.Name] = true
+
+		coord := [2]int{r.CooX, r.CooY}
+		if seenCoords[coord] {
+			fmt.Printf("ERROR <checksameroom.go>-l21: Wrong format. Same room coordinates: %d,%d", r.CooX, r.CooY)
+			return false
+		}
+		seenCoords[coord] = true
 	}
 	return true
-
 }
