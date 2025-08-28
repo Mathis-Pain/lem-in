@@ -21,11 +21,11 @@ func FileMaker(args []string) (int, *os.File) {
 		return 0, nil
 	}
 
-	n, checks := checks.FirstCheck(content)
+	ants, checks := checks.GlobalCheck(content)
 
 	if !checks {
-		return n, nil
+		return ants, nil
 	}
 
-	return n, content
+	return ants, content
 }

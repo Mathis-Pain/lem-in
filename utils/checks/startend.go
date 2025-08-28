@@ -1,4 +1,4 @@
-package unitchecks
+package checks
 
 import (
 	"bufio"
@@ -15,31 +15,32 @@ func CheckStartEnd(content *os.File) bool {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if line == "##start" {
+		switch line {
+		case "##start":
 			if hasStart {
 				return false
+			} else {
+				hasStart = true
 			}
-			hasStart = true
-			continue
-		}
-		if line == "##end" {
+		case "##end":
 			if hasEnd {
 				return false
+			} else {
+				hasEnd = true
 			}
-			hasEnd = true
-			continue
 		}
 	}
 
+	// Une fois le fichier lu en entier, vérifie que les deux salles sont bien présentes
 	if hasStart && hasEnd {
 		return true
 	}
 
 	// Si la boucle se termine et qu'il manque une des deux salles, renvoie un message d'erreur
 	if hasStart && !hasEnd {
-		fmt.Println("ERROR <checkstartend.go>-l40: Missing an end room")
+		fmt.Println("ERROR <startend.go>-l40: Missing an end room")
 	} else if hasEnd && !hasStart {
-		fmt.Println("ERROR <checkstartend.go>-l42: Missing a start room")
+		fmt.Println("ERROR <startend.go>-l42: Missing a start room")
 	}
 
 	return false

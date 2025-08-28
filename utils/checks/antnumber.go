@@ -1,4 +1,4 @@
-package unitchecks
+package checks
 
 import (
 	"fmt"
@@ -7,9 +7,9 @@ import (
 
 // Fonction pour vérifier que le nombre de fourmis en début de fichier est valide
 func CheckAntNumber(line string) bool {
-	n, err := strconv.Atoi(line)
+	ants, err := strconv.Atoi(line)
 
-	if err != nil || n <= 0 {
+	if err != nil || ants <= 0 {
 		fmt.Println("ERROR <antnumber.go>-l13: Invalid number of ants. Must be a number > 0, is", line)
 		return false
 	}

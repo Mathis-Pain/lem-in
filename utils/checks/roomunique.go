@@ -1,11 +1,11 @@
-package unitchecks
+package checks
 
 import (
 	"fmt"
 	"lem-in/models"
 )
 
-func CheckSameRoom(AllRooms models.Roomlist) bool {
+func CheckRoomUnique(AllRooms models.Roomlist) bool {
 	seenNames := make(map[string]bool)
 	seenCoords := make(map[[2]int]bool)
 
