@@ -16,10 +16,11 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 	NoMoreRooms := false
 
 	scanner := bufio.NewScanner(file)
+	linecount := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
-
+		linecount++
 		// Vérifie si la prochaine ligne est la salle de départ ou la salle de fin.
 		if line == "##start" {
 			NextIsStart = true
@@ -27,8 +28,9 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 		} else if line == "##end" {
 			NextIsEnd = true
 			continue
-		} else if line[0] == '#' {
+		} else if line[0] == '#' || linecount == 1 {
 			// Si la ligne n'est ni start ni end mais commence par un #, elle est considérée comme un commentaire et ignorée
+			// Passe la première ligne
 			continue
 		}
 
@@ -38,7 +40,7 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 		// Vérifie si une pièce ne se trouve pas au mauvais endroit du fichier
 		// Il ne peut pas y avoir de nouvelle pièce une fois qu'on a commencé à ajouter des links
 		if NoMoreRooms && len(parts) == 3 {
-			fmt.Println("ERROR <parsefile.go>-l43 : Wrong file format : new room added after the end of the room list")
+			fmt.Printf("ERROR <parsefile.go>-l43 : Wrong file format : new room added after the end of the room list (line number %d)\n", linecount)
 			os.Exit(0)
 		}
 
@@ -55,24 +57,15 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 				AllRooms.Rooms = append(AllRooms.Rooms, GetRoom(parts))
 			}
 			continue
-		} else if AllRooms.End.Name != "" {
+		} else if strings.Contains(line, "-") {
+			// Si la ligne ne comporte pas trois parties, on vérifie s'il s'agit d'un "link", tunnel entre deux salles
 			NoMoreRooms = true
-			// Si la room end n'est pas vide, ça veut dire qu'on a atteint la fin de la liste de salles
-		}
-
-		// Si la ligne ne comporte pas trois parties, on vérifie s'il s'agit d'un "link", tunnel entre deux salles
-
-		if strings.Contains(line, "-") {
 			Links = append(Links, GetLink(line))
-
+		} else {
+			fmt.Printf("ERROR <parsefile.go>-l63 : Wrong file format : line is not a comment, a room or a link. (%v - line number %v)\n", line, linecount)
+			os.Exit(1)
 		}
 	}
-
-	/* 	for _, link := range Links {
-		fmt.Println("from :", link.From)
-		fmt.Println("to :", link.To)
-		fmt.Println()
-	} */
 
 	return AllRooms, Links
 }
