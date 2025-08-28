@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+// Récupère la liste des salles et leurs coordonnées dans le fichier
 func GetRoom(parts []string) models.Room {
 	var current models.Room
 	var err error
