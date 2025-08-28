@@ -24,6 +24,8 @@ func main() {
 
 	//print.PrintFileData(content)
 
+	move.IAMoveAnts(AllPath, ants)
+
 	fmt.Printf("Fourmis : %v\n", ants)
 	for index, r := range AllPath {
 		fmt.Printf("Chemin n°%d : %d étapes %v \n", index, len(r), r)
