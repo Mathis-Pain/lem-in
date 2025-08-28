@@ -1,12 +1,14 @@
 package builder
 
+import "lem-in/models"
+
 // FilterPath s'assurent que deux chemins n'ont aucune pièce en commun
-func FilterPath(allPaths [][]string) [][]string {
+func FilterPath(allPaths models.PathList) models.PathList {
 	// Garde la trace de toutes les pièces qui ont été utilisées par un chemin
 	usedRooms := make(map[string]bool)
 
 	// Création de la liste filtrée
-	var filteredPaths [][]string
+	var filteredPaths models.PathList
 
 	// Itérer sur chaque chemin dans la liste originale.
 	for _, path := range allPaths {
