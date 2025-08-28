@@ -30,7 +30,7 @@ func ParseFile(file *os.File) (models.Roomlist, []models.Link) {
 			continue
 		} else if line[0] == '#' || linecount == 1 {
 			// Si la ligne n'est ni start ni end mais commence par un #, elle est considérée comme un commentaire et ignorée
-			// Passe la première ligne
+			// Passe aussi la première ligne (nombre de fourmis)
 			continue
 		}
 
