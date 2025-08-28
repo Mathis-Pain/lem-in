@@ -19,10 +19,10 @@ func CheckLinkNames(AllRooms models.Roomlist, Links []models.Link) bool {
 	// Vérifie pour chaque Link si la salle "From" et la salle "To" existent bien dans la liste des salles
 	for _, current := range Links {
 		if !validName[current.To] {
-			fmt.Println("ERROR <linknames.go>-l22: Wrong format. One or more links contain an invalid room name : ", current.To)
+			fmt.Printf("ERROR <linknames.go>-l22: Wrong format. One or more links contain an invalid room name. (%v)\n", current.To)
 			return false
 		} else if !validName[current.From] {
-			fmt.Println("ERROR <linknames.go>-l25: Wrong format. One or more links contain an invalid room name : ", current.From)
+			fmt.Printf("ERROR <linknames.go>-l25: Wrong format. One or more links contain an invalid room name. (%v)\n", current.From)
 			return false
 		}
 

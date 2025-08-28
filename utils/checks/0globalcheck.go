@@ -34,7 +34,7 @@ func GlobalCheck(file *os.File) (int, bool) {
 			}
 		} else if line[0] == 'L' {
 			// Le nom des salles ne doit pas commencer par un L (réservé aux fourmis)
-			fmt.Println("ERROR <globalcheck.go>-l38: Invalid room name format (starting with an L)")
+			fmt.Printf("ERROR <globalcheck.go>-l38: Invalid room name format. Room names must not start with an L. (%v)", line)
 			return ants, false
 		}
 	}

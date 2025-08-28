@@ -10,7 +10,7 @@ func CheckLinkUnique(links []models.Link) bool {
 	for _, link := range links {
 		seen[link]++
 		if seen[link] > 1 {
-			fmt.Println("ERROR <linkunique.go>l13 : Wrong format. More than one link between the two same rooms.")
+			fmt.Println("ERROR <linkunique.go>l13 : Wrong format. There is more than one link between the two same rooms.", link)
 			return false
 		}
 	}

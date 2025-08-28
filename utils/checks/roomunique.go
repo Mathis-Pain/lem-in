@@ -11,14 +11,14 @@ func CheckRoomUnique(AllRooms models.Roomlist) bool {
 
 	for _, r := range AllRooms.Rooms {
 		if seenNames[r.Name] {
-			fmt.Printf("ERROR <checksameroom.go>-l14: Wrong format. Same room name : %v", r.Name)
+			fmt.Printf("ERROR <roomunique.go>-l14: Wrong format. Two rooms have the same name : %v\n", r.Name)
 			return false
 		}
 		seenNames[r.Name] = true
 
 		coord := [2]int{r.CooX, r.CooY}
 		if seenCoords[coord] {
-			fmt.Printf("ERROR <checksameroom.go>-l21: Wrong format. Same room coordinates: %d,%d", r.CooX, r.CooY)
+			fmt.Printf("ERROR <roomunique.go>-l21: Wrong format. Two rooms have the same coordinates: %d,%d\n", r.CooX, r.CooY)
 			return false
 		}
 		seenCoords[coord] = true

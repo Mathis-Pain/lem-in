@@ -18,12 +18,14 @@ func CheckStartEnd(content *os.File) bool {
 		switch line {
 		case "##start":
 			if hasStart {
+				fmt.Println("ERROR <startend.go>-l21: There are multiple start rooms.")
 				return false
 			} else {
 				hasStart = true
 			}
 		case "##end":
 			if hasEnd {
+				fmt.Println("ERROR <startend.go>-l28: There are multiple end rooms.")
 				return false
 			} else {
 				hasEnd = true
@@ -38,9 +40,9 @@ func CheckStartEnd(content *os.File) bool {
 
 	// Si la boucle se termine et qu'il manque une des deux salles, renvoie un message d'erreur
 	if hasStart && !hasEnd {
-		fmt.Println("ERROR <startend.go>-l40: Missing an end room")
+		fmt.Println("ERROR <startend.go>-l40: Missing an end room.")
 	} else if hasEnd && !hasStart {
-		fmt.Println("ERROR <startend.go>-l42: Missing a start room")
+		fmt.Println("ERROR <startend.go>-l42: Missing a start room.")
 	}
 
 	return false
