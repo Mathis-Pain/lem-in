@@ -7,29 +7,32 @@ import (
 
 // Explore récursivement les chemins
 func explore(current string, end string, links []models.Link, visited map[string]bool, path []string, allPaths *[][]string) {
-	// Ajouter la salle actuelle au chemin
+	// Add the current room to the path.
 	path = append(path, current)
 
-	// Si on est arrivé à "end", on ajoute le chemin trouvé
+	// If the current room is the end room, we've found a complete path.
 	if current == end {
-		// faire une copie de path car slice est réutilisé
-		newRoom := make([]string, len(path))
-		copy(newRoom, path)
-		*allPaths = append(*allPaths, newRoom)
+		// Make a copy of the path because the slice is reused for backtracking.
+		newPath := make([]string, len(path))
+		copy(newPath, path)
+		*allPaths = append(*allPaths, newPath)
 		return
 	}
 
-	// Marquer la salle comme visitée pour éviter les cycles
+	// Mark the current room as visited to avoid cycles.
 	visited[current] = true
 
-	// Explorer tous les liens qui partent de cette salle
+	// Explore all links connected to the current room.
 	for _, link := range links {
+		// Check for a link going from the current room.
 		if link.From == current && !visited[link.To] {
 			explore(link.To, end, links, visited, path, allPaths)
+		} else if link.To == current && !visited[link.From] { // Corrected logic: check the 'From' room for 'visited'
+			explore(link.From, end, links, visited, path, allPaths)
 		}
 	}
 
-	// Dé-marquer la salle (backtracking)
+	// Backtrack: un-mark the room as visited so it can be part of other paths.
 	visited[current] = false
 }
 
