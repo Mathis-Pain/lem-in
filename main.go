@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"lem-in/utils"
 	"lem-in/utils/builder"
-	"lem-in/utils/move"
+
 	"os"
 )
 
@@ -15,7 +15,7 @@ func main() {
 	}
 	defer content.Close()
 
-	AllPath := move.PathLength(builder.PathMaker(content), ants)
+	AllPath := builder.PathMaker(content)
 
 	if len(AllPath) == 0 {
 		fmt.Println("There is no available path.")
@@ -24,11 +24,10 @@ func main() {
 
 	//print.PrintFileData(content)
 
-	move.IAMoveAnts(AllPath, ants)
-
 	fmt.Printf("Fourmis : %v\n", ants)
 	for index, r := range AllPath {
 		fmt.Printf("Chemin n°%d : %d étapes %v \n", index, len(r), r)
 	}
 
+	utils.MoveAnts()
 }
