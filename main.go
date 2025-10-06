@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"lem-in/data"
-	"lem-in/filterpath"
+	filterpath "lem-in/filter-path"
+	moveants "lem-in/move-ants"
 
 	"lem-in/path"
 
@@ -24,10 +25,7 @@ func main() {
 	}
 	graph := path.BuildGraph(CorrectFile)
 	paths := path.FindAllPaths(graph, file.Start, file.End)
-	paths = filterpath.UniquePaths(paths)
-	paths = filterpath.EssentialPaths(paths)
 
-	for i, path := range paths {
-		fmt.Printf("Chemin %d (%d salles) : %v\n", i+1, len(path), path)
-	}
+	paths = filterpath.SelectPathsOptimizedWithAnts(paths, file.NbAnts)
+	moveants.MoveAnts(paths, file.NbAnts)
 }
