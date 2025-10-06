@@ -2,32 +2,32 @@ package main
 
 import (
 	"fmt"
-	"lem-in/utils"
-	"lem-in/utils/builder"
+	"lem-in/data"
+	"lem-in/filterpath"
+
+	"lem-in/path"
 
 	"os"
 )
 
 func main() {
-	ants, content := utils.FileMaker(os.Args)
-	if content == nil {
+	if len(os.Args) != 2 {
+		fmt.Println("Erreur argument programme different de trois")
+	}
+	exemple := os.Args[1]
+	scanExemple := data.ReadExemple(exemple)
+	file := data.ExtractFile(scanExemple)
+	isCorrect, CorrectFile := data.TestFile(file)
+	if !isCorrect {
+		fmt.Print("Erreur suite au fichier test-file")
 		return
 	}
-	defer content.Close()
+	graph := path.BuildGraph(CorrectFile)
+	paths := path.FindAllPaths(graph, file.Start, file.End)
+	paths = filterpath.UniquePaths(paths)
+	paths = filterpath.EssentialPaths(paths)
 
-	AllPath := builder.PathMaker(content)
-
-	if len(AllPath) == 0 {
-		fmt.Println("There is no available path.")
-		return
+	for i, path := range paths {
+		fmt.Printf("Chemin %d (%d salles) : %v\n", i+1, len(path), path)
 	}
-
-	//print.PrintFileData(content)
-
-	fmt.Printf("Fourmis : %v\n", ants)
-	for index, r := range AllPath {
-		fmt.Printf("Chemin n°%d : %d étapes %v \n", index, len(r), r)
-	}
-
-	utils.MoveAnts()
 }
