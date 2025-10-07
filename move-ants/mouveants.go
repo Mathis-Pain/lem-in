@@ -7,6 +7,10 @@ import (
 
 // SimulateMovement affiche le déplacement des fourmis tour par tour
 func MoveAnts(paths [][]string, numAnts int) {
+	// Trier les chemins : par longueur croissante, et inverser si même longueur
+	// (pour avoir l'ordre t, h, 0 au lieu de 0, h, t)
+	sortPaths(paths)
+
 	// Distribuer les fourmis sur les chemins
 	antsPerPath := distributeAnts(paths, numAnts)
 
@@ -87,4 +91,47 @@ func distributeAnts(paths [][]string, numAnts int) []int {
 	}
 
 	return antsPerPath
+}
+
+// sortPaths trie les chemins par longueur, et inverse l'ordre pour les chemins de même longueur
+func sortPaths(paths [][]string) {
+	// Créer une liste avec index pour garder trace de l'ordre original
+	type pathWithIndex struct {
+		path    []string
+		origIdx int
+		length  int
+	}
+
+	items := make([]pathWithIndex, len(paths))
+	for i := range paths {
+		items[i] = pathWithIndex{
+			path:    paths[i],
+			origIdx: i,
+			length:  len(paths[i]),
+		}
+	}
+
+	// Trier par longueur croissante, puis par index décroissant si même longueur
+	for i := 0; i < len(items)-1; i++ {
+		for j := i + 1; j < len(items); j++ {
+			shouldSwap := false
+
+			if items[i].length > items[j].length {
+				// i est plus long que j, on swap
+				shouldSwap = true
+			} else if items[i].length == items[j].length && items[i].origIdx < items[j].origIdx {
+				// Même longueur, on inverse l'ordre
+				shouldSwap = true
+			}
+
+			if shouldSwap {
+				items[i], items[j] = items[j], items[i]
+			}
+		}
+	}
+
+	// Réappliquer dans paths
+	for i := range paths {
+		paths[i] = items[i].path
+	}
 }
