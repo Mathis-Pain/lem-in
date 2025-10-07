@@ -2,13 +2,15 @@ package movement
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
+// Algorithme de Load Balancing "ditribution optimale"
 // SimulateMovement affiche le déplacement des fourmis tour par tour
 func MoveAnts(paths [][]string, numAnts int) {
-	// Trier les chemins : par longueur croissante, et inverser si même longueur
-	// (pour avoir l'ordre t, h, 0 au lieu de 0, h, t)
+	// Trier les chemins : par longueur croissante, et inverser si même longueur (spécialemment pour example01.txt)
+
 	sortPaths(paths)
 
 	// Distribuer les fourmis sur les chemins
@@ -46,16 +48,15 @@ func MoveAnts(paths [][]string, numAnts int) {
 		}
 
 		// Phase 2 : Envoyer de nouvelles fourmis
-		for pathIdx := range paths {
-			// Si on doit encore envoyer des fourmis sur ce chemin
-			if pathCursor[pathIdx] < antsPerPath[pathIdx] {
+		for pathIndex := 0; pathIndex < len(paths); pathIndex++ {
+			if pathCursor[pathIndex] < antsPerPath[pathIndex] {
 				antsSent++
-				pathCursor[pathIdx]++
+				pathCursor[pathIndex]++
 
-				// Créer une nouvelle fourmi
+				// Ajouter la fourmi à suivre
 				antIDs = append(antIDs, antsSent)
-				antPaths = append(antPaths, pathIdx)
-				antPositions = append(antPositions, 0) // Position 0 = start
+				antPaths = append(antPaths, pathIndex)
+				antPositions = append(antPositions, 0)
 			}
 		}
 
@@ -64,6 +65,16 @@ func MoveAnts(paths [][]string, numAnts int) {
 			fmt.Println(strings.Join(moves, " "))
 		}
 	}
+}
+
+// sortPaths est uniquement la pour donner un ordre voulu au chemin de meme longueur pour correspondre a exemple01.txt
+func sortPaths(paths [][]string) {
+	sort.SliceStable(paths, func(i, j int) bool {
+		if len(paths[i]) == len(paths[j]) {
+			return i > j // inverse l’ordre à égalité
+		}
+		return len(paths[i]) < len(paths[j])
+	})
 }
 
 // distributeAnts distribue les fourmis sur les chemins et retourne le nombre de fourmis par chemin
@@ -79,59 +90,16 @@ func distributeAnts(paths [][]string, numAnts int) []int {
 	// Assigner chaque fourmi au chemin qui finit le plus tôt
 	for ant := 0; ant < numAnts; ant++ {
 		// Trouver le chemin avec le temps minimum
-		minIdx := 0
+		minIndex := 0
 		for i := 1; i < len(times); i++ {
-			if times[i] < times[minIdx] {
-				minIdx = i
+			if times[i] < times[minIndex] {
+				minIndex = i
 			}
 		}
 
-		antsPerPath[minIdx]++
-		times[minIdx]++
+		antsPerPath[minIndex]++
+		times[minIndex]++
 	}
 
 	return antsPerPath
-}
-
-// sortPaths trie les chemins par longueur, et inverse l'ordre pour les chemins de même longueur
-func sortPaths(paths [][]string) {
-	// Créer une liste avec index pour garder trace de l'ordre original
-	type pathWithIndex struct {
-		path    []string
-		origIdx int
-		length  int
-	}
-
-	items := make([]pathWithIndex, len(paths))
-	for i := range paths {
-		items[i] = pathWithIndex{
-			path:    paths[i],
-			origIdx: i,
-			length:  len(paths[i]),
-		}
-	}
-
-	// Trier par longueur croissante, puis par index décroissant si même longueur
-	for i := 0; i < len(items)-1; i++ {
-		for j := i + 1; j < len(items); j++ {
-			shouldSwap := false
-
-			if items[i].length > items[j].length {
-				// i est plus long que j, on swap
-				shouldSwap = true
-			} else if items[i].length == items[j].length && items[i].origIdx < items[j].origIdx {
-				// Même longueur, on inverse l'ordre
-				shouldSwap = true
-			}
-
-			if shouldSwap {
-				items[i], items[j] = items[j], items[i]
-			}
-		}
-	}
-
-	// Réappliquer dans paths
-	for i := range paths {
-		paths[i] = items[i].path
-	}
 }

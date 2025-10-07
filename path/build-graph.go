@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Permet de cree l'ensemble de tout les chemins possible
 func BuildGraph(file models.File) models.Graph {
 	graph := models.Graph{Connection: make(map[string][]string)}
 

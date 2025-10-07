@@ -129,11 +129,3 @@ func calculateTurns(paths [][]string, numAnts int) int {
 
 	return maxTime
 }
-
-// SelectPathsOptimized version simplifiée sans tenir compte du nombre de fourmis
-// (pour compatibilité avec ton code existant)
-func SelectPathsOptimized(paths [][]string) [][]string {
-	// Par défaut, utiliser un nombre de fourmis arbitraire pour trouver les meilleurs chemins
-	// ou simplement retourner tous les chemins disjoints
-	return SelectPathsOptimizedWithAnts(paths, 100)
-}
