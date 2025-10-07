@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"lem-in/data"
-	filterpath "lem-in/filter-path"
+
 	moveants "lem-in/move-ants"
 
 	"lem-in/path"
@@ -23,9 +23,13 @@ func main() {
 		fmt.Print("Erreur suite au fichier test-file")
 		return
 	}
+	// On construit tous les chemins possible grace aux liaisons
 	graph := path.BuildGraph(CorrectFile)
+	// On garde tous les chemins trié par le dfs sans room redondante
 	paths := path.FindAllPaths(graph, file.Start, file.End)
-
-	paths = filterpath.SelectPathsOptimizedWithAnts(paths, file.NbAnts)
+	// On selectionne les chemins optimaux en fonction du nombre de fourmis
+	paths = path.SelectPathsOptimizedWithAnts(paths, file.NbAnts)
+	// On les distribue dans les chemins en tour par tour et on affiche le resultat
 	moveants.MoveAnts(paths, file.NbAnts)
+
 }
