@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+
+	visualizer "lem-in/AI-visualizer"
 	"lem-in/data"
 	moveants "lem-in/move-ants"
 	"lem-in/path"
-	"lem-in/visualizer"
+
 	"os"
 )
 

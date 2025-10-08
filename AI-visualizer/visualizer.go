@@ -21,8 +21,8 @@ func Visualizer(paths [][]string, nbAnts int, file models.File) {
 	moveants.MoveAnts(paths, nbAnts, &buf)
 	savedMoves = buf.String()
 
-	// Prépare les infos des salles avec coordonnées
-	savedRooms = prepareRoomsJSON(file)
+	// Passe aussi paths pour filtrer les salles
+	savedRooms = prepareRoomsJSON(file, paths)
 
 	// Affiche aussi dans le terminal
 	fmt.Print(savedMoves)
@@ -44,14 +44,30 @@ func Visualizer(paths [][]string, nbAnts int, file models.File) {
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func prepareRoomsJSON(file models.File) string {
+func prepareRoomsJSON(file models.File, paths [][]string) string {
 	roomsData := make(map[string]map[string]interface{})
+	usedRooms := make(map[string]bool)
 
-	// Parse les rooms depuis file.Rooms (format: "nom x y")
+	// Marque toutes les salles utilisées dans les chemins
+	for _, path := range paths {
+		for _, room := range path {
+			usedRooms[room] = true
+		}
+	}
+	// Assure-toi que start est inclus
+	usedRooms[file.Start] = true
+
+	// Parse uniquement les rooms utilisées
 	for _, roomLine := range file.Rooms {
 		parts := strings.Fields(roomLine)
 		if len(parts) >= 3 {
 			name := parts[0]
+
+			// Filtre : n'ajoute que les salles utilisées
+			if !usedRooms[name] {
+				continue
+			}
+
 			x, errX := strconv.Atoi(parts[1])
 			y, errY := strconv.Atoi(parts[2])
 
