@@ -73,7 +73,11 @@ func copyPaths(paths [][]string) [][]string {
 	return cp
 }
 
-// calculateTurns calcule le nombre de tours nécessaires pour faire passer toutes les fourmis
+// regarde les chemins trouvé par le bfs
+// garde uniquement ceux qui n'on aucune salle intermediaire en commun
+// simule l’envoi des fourmis sur les chemins pour calculer le nombre total de tours nécessaires.
+// trouve la meilleure combinaison de chemins qui permet de faire sortir toutes les fourmis le plus vite possible.
+
 func calculateTurns(paths [][]string, numAnts int) int {
 	if len(paths) == 0 {
 		return MaxInt

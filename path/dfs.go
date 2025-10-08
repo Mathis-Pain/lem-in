@@ -5,7 +5,7 @@ import (
 	"sort"
 )
 
-// dfsUnique explore récursivement tous les chemins possibles sans répéter les salles intermédiaires
+// dfsUnique explore  tous les chemins possibles entre start et end sans répéter les salles intermédiaires (pour eviter de tourner en rond)
 
 func dfsUnique(graph map[string][]string, current, end string, visited map[string]bool, path []string, allPaths *[][]string) {
 	path = append(path, current)
