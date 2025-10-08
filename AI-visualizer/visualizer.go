@@ -14,6 +14,7 @@ import (
 
 var savedMoves string
 var savedRooms string
+var savedLinks string
 
 func Visualizer(paths [][]string, nbAnts int, file models.File) {
 	// Capture les mouvements
@@ -23,13 +24,14 @@ func Visualizer(paths [][]string, nbAnts int, file models.File) {
 
 	// Passe aussi paths pour filtrer les salles
 	savedRooms = prepareRoomsJSON(file, paths)
+	savedLinks = prepareLinksJSON(paths)
 
 	// Affiche aussi dans le terminal
 	fmt.Print(savedMoves)
 
 	// Lance le serveur
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "visualizer/visualizer.html")
+		http.ServeFile(w, r, "AI-visualizer/visualizer.html")
 	})
 	http.HandleFunc("/api/moves", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -39,8 +41,11 @@ func Visualizer(paths [][]string, nbAnts int, file models.File) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(savedRooms))
 	})
-
-	fmt.Println("\n🚀 Ouvre: http://localhost:8080")
+	http.HandleFunc("/api/links", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(savedLinks))
+	})
+	fmt.Println("\n Ouvre: http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
@@ -90,5 +95,32 @@ func prepareRoomsJSON(file models.File, paths [][]string) string {
 	}
 
 	jsonData, _ := json.Marshal(roomsData)
+	return string(jsonData)
+}
+func prepareLinksJSON(paths [][]string) string {
+	linksSet := make(map[string]bool)
+	var links []map[string]string
+
+	// Extrait toutes les connexions des chemins
+	for _, path := range paths {
+		for i := 0; i < len(path)-1; i++ {
+			from := path[i]
+			to := path[i+1]
+
+			// Crée une clé unique pour éviter les doublons
+			key := from + "-" + to
+			reverseKey := to + "-" + from
+
+			if !linksSet[key] && !linksSet[reverseKey] {
+				linksSet[key] = true
+				links = append(links, map[string]string{
+					"from": from,
+					"to":   to,
+				})
+			}
+		}
+	}
+
+	jsonData, _ := json.Marshal(links)
 	return string(jsonData)
 }

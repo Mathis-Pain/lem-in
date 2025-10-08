@@ -258,13 +258,16 @@
           const movesResponse = await fetch("/api/moves");
           const movesDataResponse = await movesResponse.json();
 
+          const linksResponse = await fetch("/api/links");
+          const linksData = await linksResponse.json();
+
           if (movesDataResponse.moves) {
             turns = movesDataResponse.moves
               .split("\n")
               .filter((line) => line.trim());
 
             if (roomsData && Object.keys(roomsData).length > 0) {
-              loadRoomsWithCoordinates(roomsData);
+              loadRoomsWithCoordinates(roomsData, linksData);
             }
 
             createGraph();
@@ -288,14 +291,12 @@
         }
       });
 
-      function loadRoomsWithCoordinates(roomsData) {
+      function loadRoomsWithCoordinates(roomsData, linksData) {
         rooms = {};
         paths = [];
         antsPositions = {};
         totalAnts = 0;
         finishedAnts = 0;
-
-        const connections = new Set();
 
         let minX = Infinity,
           maxX = -Infinity;
@@ -330,39 +331,21 @@
           };
         });
 
+        // Utilise les vrais liens du backend
+        linksData.forEach((link) => {
+          if (rooms[link.from] && rooms[link.to]) {
+            paths.push({ from: link.from, to: link.to });
+          }
+        });
+
+        // Compte les fourmis depuis les mouvements
         turns.forEach((turn) => {
           const moves = turn.split(" ");
           moves.forEach((move) => {
             const [ant, room] = move.split("-");
-
             const antNum = parseInt(ant.substring(1));
             if (antNum > totalAnts) totalAnts = antNum;
-
-            if (!antsPositions[ant]) {
-              antsPositions[ant] = { history: ["start"], current: "start" };
-            }
-
-            const prevRoom = antsPositions[ant].current;
-            antsPositions[ant].history.push(room);
-            antsPositions[ant].current = room;
-
-            if (
-              prevRoom &&
-              prevRoom !== room &&
-              rooms[prevRoom] &&
-              rooms[room]
-            ) {
-              const conn = [prevRoom, room].sort().join("-");
-              connections.add(conn);
-            }
           });
-        });
-
-        connections.forEach((conn) => {
-          const [room1, room2] = conn.split("-");
-          if (rooms[room1] && rooms[room2]) {
-            paths.push({ from: room1, to: room2 });
-          }
         });
 
         document.getElementById("totalTurns").textContent = turns.length;
