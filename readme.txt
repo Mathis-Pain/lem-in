@@ -1,8 +1,6 @@
 Pour lancer le programme 
 
 
-
-
 go run . examples/example00.txt
 go run . examples/example01.txt
 go run . examples/example02.txt
