@@ -30,9 +30,15 @@ func Visualizer(paths [][]string, nbAnts int, file models.File) {
 	fmt.Print(savedMoves)
 
 	// Lance le serveur
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "AI-visualizer/visualizer.html")
+	// ✨ 1. D'ABORD les fichiers CSS et JS
+	http.HandleFunc("/styles.css", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "AI-visualizer/styles.css")
 	})
+	http.HandleFunc("/script.js", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "AI-visualizer/script.js")
+	})
+
+	// ✨ 2. ENSUITE les routes API
 	http.HandleFunc("/api/moves", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"moves": savedMoves})
@@ -45,6 +51,12 @@ func Visualizer(paths [][]string, nbAnts int, file models.File) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(savedLinks))
 	})
+
+	// ✨ 3. EN DERNIER la route "/" pour le HTML
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "AI-visualizer/visualizer.html")
+	})
+
 	fmt.Println("\n Ouvre: http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -97,6 +109,7 @@ func prepareRoomsJSON(file models.File, paths [][]string) string {
 	jsonData, _ := json.Marshal(roomsData)
 	return string(jsonData)
 }
+
 func prepareLinksJSON(paths [][]string) string {
 	linksSet := make(map[string]bool)
 	var links []map[string]string
