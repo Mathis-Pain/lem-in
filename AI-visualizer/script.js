@@ -5,34 +5,26 @@ let isPaused = false;
 let speed = 1;
 let rooms = {};
 let paths = [];
-let antsPositions = {};
 let totalAnts = 0;
 let finishedAnts = 0;
 let finishedAntsSet = new Set();
-let antPreviousPositions = {}; // Track previous positions for path following
+let antPreviousPositions = {};
 
 window.onload = async function () {
-  console.log("🔵 window.onload - Démarrage du chargement");
   try {
     const roomsResponse = await fetch("/api/rooms");
     const roomsData = await roomsResponse.json();
-    console.log("✅ Rooms chargées:", Object.keys(roomsData).length, "salles");
 
     const movesResponse = await fetch("/api/moves");
     const movesDataResponse = await movesResponse.json();
-    console.log("✅ Moves reçues:", movesDataResponse);
 
     const linksResponse = await fetch("/api/links");
     const linksData = await linksResponse.json();
-    console.log("✅ Links chargés:", linksData.length, "liens");
 
     if (movesDataResponse.moves) {
       turns = movesDataResponse.moves
         .split("\n")
         .filter((line) => line.trim());
-      
-      console.log("✅ Turns parsés:", turns.length, "tours");
-      console.log("Premier tour:", turns[0]);
 
       if (roomsData && Object.keys(roomsData).length > 0) {
         loadRoomsWithCoordinates(roomsData, linksData);
@@ -41,9 +33,6 @@ window.onload = async function () {
       createGraph();
       document.querySelector(".loading").style.display = "none";
       document.getElementById("totalTurns").textContent = turns.length;
-      console.log("✅ Initialisation terminée");
-    } else {
-      console.error("❌ Aucun mouvement reçu!");
     }
   } catch (error) {
     console.error("❌ Erreur de chargement:", error);
@@ -65,7 +54,6 @@ document.getElementById("speedRange").addEventListener("input", (e) => {
 function loadRoomsWithCoordinates(roomsData, linksData) {
   rooms = {};
   paths = [];
-  antsPositions = {};
   totalAnts = 0;
   finishedAnts = 0;
 
@@ -179,9 +167,6 @@ function createGraph() {
 }
 
 function startAnimation() {
-  console.log("🟢 startAnimation appelée");
-  console.log("Nombre de tours disponibles:", turns.length);
-  
   currentTurnIndex = 0;
   finishedAnts = 0;
   finishedAntsSet.clear();
@@ -195,18 +180,13 @@ function startAnimation() {
   document.querySelectorAll(".ant").forEach((ant) => ant.remove());
 
   if (animationInterval) {
-    console.log("Nettoyage de l'ancien interval");
     clearInterval(animationInterval);
   }
   
-  console.log("Démarrage du setInterval avec vitesse:", speed);
   animationInterval = setInterval(nextTurn, 1000 / speed);
-  console.log("Interval ID:", animationInterval);
 }
 
-let antFlipState = {};
-
-function animateAntAlongPath(antElement, fromRoom, toRoom, duration, callback) {
+function animateAntAlongPath(antElement, fromRoom, toRoom, fromRoomName, toRoomName, duration, callback) {
   const emojiText = antElement.querySelector(".ant-emoji");
   const startX = fromRoom.x;
   const startY = fromRoom.y;
@@ -214,6 +194,10 @@ function animateAntAlongPath(antElement, fromRoom, toRoom, duration, callback) {
   const endY = toRoom.y;
   
   const startTime = performance.now();
+  
+  // Vérifie si on est sur un segment à incliner
+  const needsTilt = (fromRoomName === "richard" && toRoomName === "dinish") ||
+                    (fromRoomName === "gilfoyle" && toRoomName === "peter");
   
   function animate(currentTime) {
     const elapsed = currentTime - startTime;
@@ -226,20 +210,22 @@ function animateAntAlongPath(antElement, fromRoom, toRoom, duration, callback) {
     emojiText.setAttribute("x", currentX);
     emojiText.setAttribute("y", currentY);
     
-    // Rotation basée sur la direction
-    const angle = Math.atan2(endY - startY, endX - startX) * (180 / Math.PI);
-    const antId = antElement.id.replace("ant-", "");
-    
     // Dandiner pendant le mouvement
     const wiggleAngle = Math.sin(progress * Math.PI * 4) * 10;
-    const rotation = angle + wiggleAngle;
     
-    emojiText.setAttribute("transform", `rotate(${rotation} ${currentX} ${currentY})`);
+    // Transformation différente selon si on doit incliner ou pas
+    if (needsTilt) {
+      // Pour les segments spéciaux : rotation PUIS miroir
+      const tiltAngle = 70;
+      emojiText.setAttribute("transform", `rotate(${tiltAngle + wiggleAngle} ${currentX} ${currentY}) translate(${currentX * 2}, 0) scale(-1, 1)`);
+    } else {
+      // Pour les autres segments : miroir PUIS rotation (comme avant)
+      emojiText.setAttribute("transform", `translate(${currentX * 2}, 0) scale(-1, 1) rotate(${wiggleAngle} ${currentX} ${currentY})`);
+    }
     
     if (progress < 1) {
       requestAnimationFrame(animate);
     } else if (callback) {
-      // Animation terminée, appeler le callback s'il existe
       callback();
     }
   }
@@ -248,7 +234,6 @@ function animateAntAlongPath(antElement, fromRoom, toRoom, duration, callback) {
 }
 
 function pauseAntInRoom(antElement, room, pauseDuration) {
-  // Effet de pulsation pendant la pause
   const emojiText = antElement.querySelector(".ant-emoji");
   const startTime = performance.now();
   const originalSize = 28;
@@ -262,7 +247,6 @@ function pauseAntInRoom(antElement, room, pauseDuration) {
       emojiText.setAttribute("font-size", newSize);
       requestAnimationFrame(pulse);
     } else {
-      // Remettre la taille normale
       emojiText.setAttribute("font-size", originalSize);
     }
   }
@@ -281,17 +265,12 @@ function nextTurn() {
   const turn = turns[currentTurnIndex];
   const moves = turn.split(" ");
   const svg = document.getElementById("graphSvg");
-  
-  console.log("Turn:", currentTurnIndex, "Moves:", moves);
 
   const activeAnts = new Set();
-  const antsInEndRoom = new Set();
 
   moves.forEach((move) => {
     const [ant, room] = move.split("-");
     activeAnts.add(ant);
-    
-    console.log("Processing ant:", ant, "to room:", room);
 
     if (rooms[room]) {
       let antElement = document.getElementById(`ant-${ant}`);
@@ -304,15 +283,16 @@ function nextTurn() {
         
         // Trouve la salle de départ (type "start")
         let startRoom = null;
+        let startRoomName = null;
         for (let roomName in rooms) {
           if (rooms[roomName].type === "start") {
             startRoom = rooms[roomName];
+            startRoomName = roomName;
             break;
           }
         }
         
         const emojiText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        // Place la fourmi à la position de départ
         emojiText.setAttribute("x", startRoom.x);
         emojiText.setAttribute("y", startRoom.y);
         emojiText.setAttribute("font-size", "28");
@@ -328,12 +308,12 @@ function nextTurn() {
         const duration = 800 / speed;
         const isIntermediateRoom = rooms[room].type !== "start" && rooms[room].type !== "end";
         
-        if (isIntermediateRoom && (room === "gilfoyle" || room === "dinesh" || room === "jimYoung")) {
-          animateAntAlongPath(g, startRoom, rooms[room], duration, () => {
+        if (isIntermediateRoom && (room === "gilfoyle" || room === "dinish" || room === "jimYoung")) {
+          animateAntAlongPath(g, startRoom, rooms[room], startRoomName, room, duration, () => {
             pauseAntInRoom(g, rooms[room], 400 / speed);
           });
         } else {
-          animateAntAlongPath(g, startRoom, rooms[room], duration);
+          animateAntAlongPath(g, startRoom, rooms[room], startRoomName, room, duration);
         }
         
         antPreviousPositions[ant] = room;
@@ -341,32 +321,27 @@ function nextTurn() {
         // Anime le déplacement depuis la position précédente
         const previousRoom = antPreviousPositions[ant];
         if (previousRoom && rooms[previousRoom]) {
-          const duration = 800 / speed; // Durée de l'animation en ms
+          const duration = 800 / speed;
           
-          // Vérifier si la fourmi arrive à une salle intermédiaire (pas start ni end)
           const isIntermediateRoom = rooms[room].type !== "start" && rooms[room].type !== "end";
           
-          if (isIntermediateRoom && (room === "gilfoyle" || room === "dinesh" || room === "jimYoung")) {
-            // Animer jusqu'à la salle, puis faire une pause visible
-            animateAntAlongPath(antElement, rooms[previousRoom], rooms[room], duration, () => {
-              pauseAntInRoom(antElement, rooms[room], 400 / speed); // Pause de 400ms
+          if (isIntermediateRoom && (room === "gilfoyle" || room === "dinish" || room === "jimYoung")) {
+            animateAntAlongPath(antElement, rooms[previousRoom], rooms[room], previousRoom, room, duration, () => {
+              pauseAntInRoom(antElement, rooms[room], 400 / speed);
             });
           } else {
-            // Animation normale sans pause
-            animateAntAlongPath(antElement, rooms[previousRoom], rooms[room], duration);
+            animateAntAlongPath(antElement, rooms[previousRoom], rooms[room], previousRoom, room, duration);
           }
         }
         antPreviousPositions[ant] = room;
       }
 
-      // Marque les fourmis arrivées dans la salle de fin
       if (rooms[room].type === "end") {
         finishedAntsSet.add(ant);
       }
     }
   });
 
-  // Supprime les fourmis qui ne sont plus actives (arrivées)
   document.querySelectorAll(".ant").forEach((antElement) => {
     const antId = antElement.id.replace("ant-", "");
     if (!activeAnts.has(antId)) {
@@ -375,7 +350,6 @@ function nextTurn() {
     }
   });
 
-  // Met à jour les compteurs
   finishedAnts = finishedAntsSet.size;
 
   currentTurnIndex++;
