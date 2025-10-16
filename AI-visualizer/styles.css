@@ -146,14 +146,28 @@ svg {
   stroke-width: 3;
 }
 
+/* TROU VERT (START) */
 .room.start circle {
-  fill: #28a745;
-  stroke: #1e7e34;
+  fill: #1a5928;
+  stroke: #28a745;
+  stroke-width: 5;
+  filter: drop-shadow(0 0 10px rgba(40, 167, 69, 0.6));
 }
 
+.room.start .hole-inner {
+  fill: #0d2818;
+}
+
+/* TROU ROUGE (END) */
 .room.end circle {
-  fill: #dc3545;
-  stroke: #bd2130;
+  fill: #6b1a1a;
+  stroke: #dc3545;
+  stroke-width: 5;
+  filter: drop-shadow(0 0 10px rgba(220, 53, 69, 0.6));
+}
+
+.room.end .hole-inner {
+  fill: #2d0a0a;
 }
 
 .room:hover circle {
@@ -175,22 +189,32 @@ svg {
   opacity: 0.6;
 }
 
+/* FOURMIS - Animation fluide le long des chemins */
 .ant {
-  transition: all 0.5s ease-in-out;
+  opacity: 1;
+  /* Plus de transition CSS, on utilise requestAnimationFrame */
 }
 
-.ant circle {
-  fill: #ff6b6b;
-  stroke: #c92a2a;
-  stroke-width: 2;
+.ant-emoji {
+  font-size: 30px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  user-select: none;
+  pointer-events: none;
+  /* Plus de transition ici non plus, tout est géré en JS */
 }
 
-.ant text {
-  fill: white;
-  font-size: 12px;
+.ant-number {
+  fill: #495057;
+  font-size: 11px;
   font-weight: bold;
   text-anchor: middle;
   dominant-baseline: middle;
+  paint-order: stroke fill;
+  stroke: white;
+  stroke-width: 3px;
+  user-select: none;
+  pointer-events: none;
 }
 
 .loading {
