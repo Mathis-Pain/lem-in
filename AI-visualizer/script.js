@@ -112,6 +112,37 @@ function createGraph() {
   const svg = document.getElementById("graphSvg");
   svg.innerHTML = "";
 
+  // Ajoute des dégradés pour les trous
+  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+  
+  // Dégradé vert pour le départ
+  const startGradient = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+  startGradient.setAttribute("id", "startGradient");
+  const startStop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+  startStop1.setAttribute("offset", "0%");
+  startStop1.setAttribute("style", "stop-color:#1a3d1a;stop-opacity:1");
+  const startStop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+  startStop2.setAttribute("offset", "100%");
+  startStop2.setAttribute("style", "stop-color:#228B22;stop-opacity:1");
+  startGradient.appendChild(startStop1);
+  startGradient.appendChild(startStop2);
+  
+  // Dégradé rouge pour la fin
+  const endGradient = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+  endGradient.setAttribute("id", "endGradient");
+  const endStop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+  endStop1.setAttribute("offset", "0%");
+  endStop1.setAttribute("style", "stop-color:#4d0000;stop-opacity:1");
+  const endStop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+  endStop2.setAttribute("offset", "100%");
+  endStop2.setAttribute("style", "stop-color:#8B0000;stop-opacity:1");
+  endGradient.appendChild(endStop1);
+  endGradient.appendChild(endStop2);
+  
+  defs.appendChild(startGradient);
+  defs.appendChild(endGradient);
+  svg.appendChild(defs);
+
   paths.forEach((path) => {
     const from = rooms[path.from];
     const to = rooms[path.to];
@@ -187,7 +218,7 @@ function startAnimation() {
 }
 
 function animateAntAlongPath(antElement, fromRoom, toRoom, fromRoomName, toRoomName, duration, callback) {
-  const emojiText = antElement.querySelector(".ant-emoji");
+  const antSvg = antElement.querySelector(".ant-svg");
   const startX = fromRoom.x;
   const startY = fromRoom.y;
   const endX = toRoom.x;
@@ -195,9 +226,8 @@ function animateAntAlongPath(antElement, fromRoom, toRoom, fromRoomName, toRoomN
   
   const startTime = performance.now();
   
-  // Vérifie si on est sur un segment à incliner
-  const needsTilt = (fromRoomName === "richard" && toRoomName === "dinish") ||
-                    (fromRoomName === "gilfoyle" && toRoomName === "peter");
+  // Calcule l'angle de la ligne droite entre les deux cercles
+  const lineAngle = Math.atan2(endY - startY, endX - startX) * (180 / Math.PI);
   
   function animate(currentTime) {
     const elapsed = currentTime - startTime;
@@ -207,21 +237,15 @@ function animateAntAlongPath(antElement, fromRoom, toRoom, fromRoomName, toRoomN
     const currentX = startX + (endX - startX) * progress;
     const currentY = startY + (endY - startY) * progress;
     
-    emojiText.setAttribute("x", currentX);
-    emojiText.setAttribute("y", currentY);
+    // Petit dandinage
+    const wiggleAngle = Math.sin(progress * Math.PI * 4) * 5;
     
-    // Dandiner pendant le mouvement
-    const wiggleAngle = Math.sin(progress * Math.PI * 4) * 10;
+    // Rotation : angle de la ligne + 90° (fourmi orientée vers le haut par défaut)
+    const finalRotation = lineAngle + 90 + wiggleAngle;
     
-    // Transformation différente selon si on doit incliner ou pas
-    if (needsTilt) {
-      // Pour les segments spéciaux : rotation PUIS miroir
-      const tiltAngle = 70;
-      emojiText.setAttribute("transform", `rotate(${tiltAngle + wiggleAngle} ${currentX} ${currentY}) translate(${currentX * 2}, 0) scale(-1, 1)`);
-    } else {
-      // Pour les autres segments : miroir PUIS rotation (comme avant)
-      emojiText.setAttribute("transform", `translate(${currentX * 2}, 0) scale(-1, 1) rotate(${wiggleAngle} ${currentX} ${currentY})`);
-    }
+    // Applique la transformation : translate puis rotate
+    const transform = `translate(${currentX}, ${currentY}) rotate(${finalRotation})`;
+    antSvg.setAttribute("transform", transform);
     
     if (progress < 1) {
       requestAnimationFrame(animate);
@@ -233,31 +257,15 @@ function animateAntAlongPath(antElement, fromRoom, toRoom, fromRoomName, toRoomN
   requestAnimationFrame(animate);
 }
 
-function pauseAntInRoom(antElement, room, pauseDuration) {
-  const emojiText = antElement.querySelector(".ant-emoji");
-  const startTime = performance.now();
-  const originalSize = 28;
-  
-  function pulse(currentTime) {
-    const elapsed = currentTime - startTime;
-    if (elapsed < pauseDuration) {
-      const pulseProgress = (elapsed % 300) / 300;
-      const scale = 1 + Math.sin(pulseProgress * Math.PI) * 0.2;
-      const newSize = originalSize * scale;
-      emojiText.setAttribute("font-size", newSize);
-      requestAnimationFrame(pulse);
-    } else {
-      emojiText.setAttribute("font-size", originalSize);
-    }
-  }
-  
-  requestAnimationFrame(pulse);
-}
-
 function nextTurn() {
   if (isPaused || currentTurnIndex >= turns.length) {
     if (currentTurnIndex >= turns.length) {
       clearInterval(animationInterval);
+      // Attends que toutes les animations se terminent (800ms + délai)
+      setTimeout(() => {
+        document.getElementById("activeAnts").textContent = "0";
+        document.getElementById("finishedAnts").textContent = finishedAntsSet.size;
+      }, 1000 / speed);
     }
     return;
   }
@@ -271,17 +279,15 @@ function nextTurn() {
   moves.forEach((move) => {
     const [ant, room] = move.split("-");
     activeAnts.add(ant);
-
+    
     if (rooms[room]) {
       let antElement = document.getElementById(`ant-${ant}`);
       
       if (!antElement) {
-        // Crée une nouvelle fourmi - elle part forcément de la salle de départ
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         g.setAttribute("class", "ant");
         g.setAttribute("id", `ant-${ant}`);
         
-        // Trouve la salle de départ (type "start")
         let startRoom = null;
         let startRoomName = null;
         for (let roomName in rooms) {
@@ -292,25 +298,97 @@ function nextTurn() {
           }
         }
         
-        const emojiText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        emojiText.setAttribute("x", startRoom.x);
-        emojiText.setAttribute("y", startRoom.y);
-        emojiText.setAttribute("font-size", "28");
-        emojiText.setAttribute("text-anchor", "middle");
-        emojiText.setAttribute("dominant-baseline", "central");
-        emojiText.setAttribute("class", "ant-emoji");
-        emojiText.textContent = "🐜";
-        g.appendChild(emojiText);
+        // Crée une fourmi SVG
+        const antSvg = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        antSvg.setAttribute("class", "ant-svg");
+        
+        // Corps de la fourmi (3 ellipses) - orientée vers le haut par défaut
+        const head = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        head.setAttribute("cx", "0");
+        head.setAttribute("cy", "-8");
+        head.setAttribute("rx", "3");
+        head.setAttribute("ry", "4");
+        head.setAttribute("fill", "#2c1810");
+        
+        const thorax = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        thorax.setAttribute("cx", "0");
+        thorax.setAttribute("cy", "0");
+        thorax.setAttribute("rx", "4");
+        thorax.setAttribute("ry", "5");
+        thorax.setAttribute("fill", "#3d2415");
+        
+        const abdomen = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        abdomen.setAttribute("cx", "0");
+        abdomen.setAttribute("cy", "8");
+        abdomen.setAttribute("rx", "5");
+        abdomen.setAttribute("ry", "7");
+        abdomen.setAttribute("fill", "#2c1810");
+        
+        // Pattes
+        for (let i = 0; i < 6; i++) {
+          const leg = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          const side = i % 2 === 0 ? -1 : 1;
+          const yPos = -3 + Math.floor(i / 2) * 3;
+          leg.setAttribute("x1", "0");
+          leg.setAttribute("y1", yPos);
+          leg.setAttribute("x2", side * 8);
+          leg.setAttribute("y2", yPos + 5);
+          leg.setAttribute("stroke", "#2c1810");
+          leg.setAttribute("stroke-width", "1.5");
+          antSvg.appendChild(leg);
+        }
+        
+        // Antennes
+        const antenna1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        antenna1.setAttribute("x1", "0");
+        antenna1.setAttribute("y1", "-12");
+        antenna1.setAttribute("x2", "-3");
+        antenna1.setAttribute("y2", "-16");
+        antenna1.setAttribute("stroke", "#2c1810");
+        antenna1.setAttribute("stroke-width", "1");
+        
+        const antenna2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        antenna2.setAttribute("x1", "0");
+        antenna2.setAttribute("y1", "-12");
+        antenna2.setAttribute("x2", "3");
+        antenna2.setAttribute("y2", "-16");
+        antenna2.setAttribute("stroke", "#2c1810");
+        antenna2.setAttribute("stroke-width", "1");
+        
+        // Assemble la fourmi
+        antSvg.appendChild(abdomen);
+        antSvg.appendChild(thorax);
+        antSvg.appendChild(head);
+        antSvg.appendChild(antenna1);
+        antSvg.appendChild(antenna2);
+        
+        // Positionne la fourmi au départ
+        antSvg.setAttribute("transform", `translate(${startRoom.x}, ${startRoom.y})`);
+        
+        g.appendChild(antSvg);
         
         svg.appendChild(g);
         
-        // Anime immédiatement vers la première destination
         const duration = 800 / speed;
-        const isIntermediateRoom = rooms[room].type !== "start" && rooms[room].type !== "end";
         
-        if (isIntermediateRoom && (room === "gilfoyle" || room === "dinish" || room === "jimYoung")) {
+        // Si c'est la destination finale, ajoute un callback pour supprimer après
+        if (rooms[room].type === "end") {
           animateAntAlongPath(g, startRoom, rooms[room], startRoomName, room, duration, () => {
-            pauseAntInRoom(g, rooms[room], 400 / speed);
+            finishedAntsSet.add(ant);
+            // Met à jour le compteur immédiatement quand la fourmi arrive
+            document.getElementById("finishedAnts").textContent = finishedAntsSet.size;
+            
+            // Supprime après 0.5 seconde
+            setTimeout(() => {
+              activeAnts.delete(ant);
+              const antToRemove = document.getElementById(`ant-${ant}`);
+              if (antToRemove) {
+                antToRemove.remove();
+                delete antPreviousPositions[ant];
+              }
+              const activeCount = activeAnts.size - finishedAntsSet.size;
+              document.getElementById("activeAnts").textContent = Math.max(0, activeCount);
+            }, 500 / speed);
           });
         } else {
           animateAntAlongPath(g, startRoom, rooms[room], startRoomName, room, duration);
@@ -318,16 +396,28 @@ function nextTurn() {
         
         antPreviousPositions[ant] = room;
       } else {
-        // Anime le déplacement depuis la position précédente
         const previousRoom = antPreviousPositions[ant];
         if (previousRoom && rooms[previousRoom]) {
           const duration = 800 / speed;
           
-          const isIntermediateRoom = rooms[room].type !== "start" && rooms[room].type !== "end";
-          
-          if (isIntermediateRoom && (room === "gilfoyle" || room === "dinish" || room === "jimYoung")) {
+          // Si c'est la destination finale, ajoute un callback pour supprimer après
+          if (rooms[room].type === "end") {
             animateAntAlongPath(antElement, rooms[previousRoom], rooms[room], previousRoom, room, duration, () => {
-              pauseAntInRoom(antElement, rooms[room], 400 / speed);
+              finishedAntsSet.add(ant);
+              // Met à jour le compteur immédiatement quand la fourmi arrive
+              document.getElementById("finishedAnts").textContent = finishedAntsSet.size;
+              
+              // Supprime après 0.5 seconde
+              setTimeout(() => {
+                activeAnts.delete(ant);
+                const antToRemove = document.getElementById(`ant-${ant}`);
+                if (antToRemove) {
+                  antToRemove.remove();
+                  delete antPreviousPositions[ant];
+                }
+                const activeCount = activeAnts.size - finishedAntsSet.size;
+                document.getElementById("activeAnts").textContent = Math.max(0, activeCount);
+              }, 500 / speed);
             });
           } else {
             animateAntAlongPath(antElement, rooms[previousRoom], rooms[room], previousRoom, room, duration);
@@ -335,26 +425,27 @@ function nextTurn() {
         }
         antPreviousPositions[ant] = room;
       }
-
-      if (rooms[room].type === "end") {
-        finishedAntsSet.add(ant);
-      }
     }
   });
 
+  // Supprime les fourmis qui ne sont plus actives (sauf celles qui vont vers end ou sont dans end)
   document.querySelectorAll(".ant").forEach((antElement) => {
     const antId = antElement.id.replace("ant-", "");
-    if (!activeAnts.has(antId)) {
+    // Ne pas supprimer si la fourmi est finie (elle a son propre timer de suppression)
+    if (!activeAnts.has(antId) && !finishedAntsSet.has(antId)) {
       antElement.remove();
       delete antPreviousPositions[antId];
     }
   });
 
+  // Met à jour les compteurs
+  // Pour le compteur d'actifs, on soustrait les fourmis finies
+  const activeCount = activeAnts.size - finishedAntsSet.size;
   finishedAnts = finishedAntsSet.size;
 
   currentTurnIndex++;
   document.getElementById("currentTurn").textContent = currentTurnIndex;
-  document.getElementById("activeAnts").textContent = activeAnts.size;
+  document.getElementById("activeAnts").textContent = Math.max(0, activeCount);
   document.getElementById("finishedAnts").textContent = finishedAnts;
 }
 

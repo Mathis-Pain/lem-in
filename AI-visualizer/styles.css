@@ -6,7 +6,7 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #8B7355 0%, #D2B48C 50%, #8B7355 100%);
   min-height: 100vh;
   padding: 20px;
 }
@@ -14,28 +14,34 @@ body {
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #2d1f15 0%, #1a120d 100%);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   overflow: hidden;
+  border: 3px solid #8B7355;
 }
 
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #4a3728 0%, #2d1f15 100%);
+  color: #F5DEB3;
   padding: 30px;
   text-align: center;
+  border-bottom: 2px solid #8B7355;
 }
 
 .header h1 {
   font-size: 2.5em;
   margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  color: #F4A460;
 }
 
 .controls {
   padding: 25px;
-  background: #f8f9fa;
-  border-bottom: 2px solid #e9ecef;
+  background: linear-gradient(135deg, #3d2817 0%, #2a1a0f 100%);
+  border-bottom: 2px solid #654321;
 }
 
 .button-group {
@@ -47,70 +53,77 @@ body {
 
 button {
   padding: 12px 25px;
-  border: none;
+  border: 2px solid #8B7355;
   border-radius: 8px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+  color: #F5DEB3;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 12px rgba(139, 69, 19, 0.4);
+  background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: white;
+  background: linear-gradient(135deg, #654321 0%, #4a3728 100%);
+  color: #D2B48C;
 }
 
 .btn-secondary:hover {
-  background: #5a6268;
+  background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
 }
 
 .btn-success {
-  background: #28a745;
-  color: white;
+  background: linear-gradient(135deg, #556B2F 0%, #3d4f21 100%);
+  color: #ADFF2F;
 }
 
 .btn-success:hover {
-  background: #218838;
+  background: linear-gradient(135deg, #6B8E23 0%, #556B2F 100%);
 }
 
 .speed-control {
   display: flex;
   align-items: center;
   gap: 10px;
+  color: #F5DEB3;
 }
 
 .speed-control input {
   width: 150px;
+  accent-color: #8B4513;
 }
 
 .stats {
   display: flex;
   gap: 20px;
   padding: 20px 25px;
-  background: #e9ecef;
+  background: linear-gradient(135deg, #2a1a0f 0%, #1a0f08 100%);
   flex-wrap: wrap;
 }
 
 .stat-item {
-  background: white;
+  background: linear-gradient(135deg, #4a3728 0%, #3d2817 100%);
   padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid #654321;
 }
 
 .stat-label {
   font-size: 12px;
-  color: #6c757d;
+  color: #D2B48C;
   text-transform: uppercase;
   margin-bottom: 5px;
 }
@@ -118,21 +131,34 @@ button {
 .stat-value {
   font-size: 24px;
   font-weight: bold;
-  color: #495057;
+  color: #F4A460;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 #visualization {
   padding: 40px;
   min-height: 500px;
   position: relative;
+  background: 
+    linear-gradient(180deg, rgba(101, 67, 33, 0.3) 0%, transparent 20%),
+    radial-gradient(ellipse at 30% 40%, rgba(139, 115, 85, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(139, 115, 85, 0.15) 0%, transparent 50%),
+    linear-gradient(135deg, #D2B48C 0%, #C4A574 50%, #A0826D 100%);
 }
 
 svg {
   width: 100%;
   height: 600px;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  background: #fafafa;
+  border: 4px solid #654321;
+  border-radius: 15px;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(139, 69, 19, 0.1) 0%, transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(139, 115, 85, 0.15) 0%, transparent 40%),
+    linear-gradient(180deg, #E8D4B0 0%, #D2B48C 30%, #C19A6B 70%, #A0826D 100%);
+  box-shadow: 
+    inset 0 5px 15px rgba(0, 0, 0, 0.3),
+    inset 0 -5px 15px rgba(255, 255, 255, 0.1),
+    0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .room {
@@ -141,58 +167,63 @@ svg {
 }
 
 .room circle {
-  fill: #fff;
-  stroke: #667eea;
+  fill: #8B6914;
+  stroke: #654321;
   stroke-width: 3;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
 }
 
 /* TROU VERT (START) */
 .room.start circle {
-  fill: #1a5928;
-  stroke: #28a745;
+  fill: url(#startGradient);
+  stroke: #2F4F2F;
   stroke-width: 5;
-  filter: drop-shadow(0 0 10px rgba(40, 167, 69, 0.6));
+  filter: drop-shadow(0 0 10px rgba(34, 139, 34, 0.6));
 }
 
 .room.start .hole-inner {
-  fill: #0d2818;
+  fill: #1a3d1a;
 }
 
 /* TROU ROUGE (END) */
 .room.end circle {
-  fill: #6b1a1a;
-  stroke: #dc3545;
+  fill: url(#endGradient);
+  stroke: #8B0000;
   stroke-width: 5;
-  filter: drop-shadow(0 0 10px rgba(220, 53, 69, 0.6));
+  filter: drop-shadow(0 0 10px rgba(139, 0, 0, 0.6));
 }
 
 .room.end .hole-inner {
-  fill: #2d0a0a;
+  fill: #4d0000;
 }
 
 .room:hover circle {
   stroke-width: 5;
-  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6));
+  filter: drop-shadow(0 0 12px rgba(139, 69, 19, 0.8));
 }
 
 .room text {
-  fill: #495057;
+  fill: #654321;
   font-size: 14px;
   font-weight: bold;
   pointer-events: none;
+  text-shadow: 
+    1px 1px 2px rgba(255, 255, 255, 0.5),
+    -1px -1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .path {
   fill: none;
-  stroke: #adb5bd;
-  stroke-width: 2;
-  opacity: 0.6;
+  stroke: #654321;
+  stroke-width: 3;
+  opacity: 0.4;
+  stroke-dasharray: 5, 5;
 }
 
-/* FOURMIS - Animation fluide le long des chemins */
+/* FOURMIS */
 .ant {
   opacity: 1;
-  /* Plus de transition CSS, on utilise requestAnimationFrame */
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
 }
 
 .ant-emoji {
@@ -201,7 +232,6 @@ svg {
   dominant-baseline: middle;
   user-select: none;
   pointer-events: none;
-  /* Plus de transition ici non plus, tout est géré en JS */
 }
 
 .ant-number {
@@ -221,5 +251,23 @@ svg {
   text-align: center;
   padding: 20px;
   font-size: 18px;
-  color: #667eea;
+  color: #F4A460;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Texture de sol avec effet de grains */
+#visualization::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 15% 25%, rgba(101, 67, 33, 0.3) 1px, transparent 1px),
+    radial-gradient(circle at 85% 75%, rgba(101, 67, 33, 0.3) 1px, transparent 1px),
+    radial-gradient(circle at 45% 50%, rgba(101, 67, 33, 0.2) 2px, transparent 2px);
+  background-size: 80px 80px, 120px 120px, 150px 150px;
+  pointer-events: none;
+  opacity: 0.4;
 }
